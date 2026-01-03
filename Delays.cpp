@@ -1,14 +1,14 @@
 #include <iostream>
 
 #include <vector>
-#include "Effects.h"
+#include "Effects_V2.h"
 #include "AudioFile.h"
 
 
 int main() {
     // 1) Load input wav
     AudioFile<float> audio;
-    if (!audio.load("PCcity.wav")) {
+    if (!audio.load("demo_guitar.wav")) {
         std::cerr << "Failed to load input.wav\n";
         return 1;
     }
@@ -30,25 +30,14 @@ int main() {
 
     std::size_t delay_samples = static_cast<std::size_t> (std::llround((delayMs / 1000.0f) * sampleRate));
 
-    if (delay_samples >= BUF_SIZE) {
-        std::cerr << "Delay too large for BUF_SIZE.\n"
-                  << "delay_samples = " << delay_samples
-                  << ", BUF_SIZE = " << BUF_SIZE << "\n"
-                  << "Increase BUF_SIZE (power of two) or reduce delayMs.\n";
-        return 1;
-    }
-
     // 3) Create one processor per channel (VERY IMPORTANT)
-    std::vector<DelayIIRProcessor> processors(static_cast<std::size_t>(numChannels));
-    std::vector<VibratoProcessor> vibrato_processor(static_cast<std::size_t>(numChannels));
-
-    // 4) Process samples in-place
+    std::vector<Flanger> effect(numChannels);
+    
     for (int ch = 0; ch < numChannels; ++ch) {
-        auto& samples = audio.samples[ch]; // vector<float>
-        auto& samples_vibrato = audio.samples[ch]; // vector<float>
+        effect[ch].set_parameters_terminal();
+        auto& s = audio.samples[ch];
         for (int n = 0; n < numSamples; ++n) {
-            samples[n] = processors[static_cast<std::size_t>(ch)].process(samples[n], delay_samples, wetness, feedback);
-            samples_vibrato[n] = vibrato_processor[static_cast<std::size_t>(ch)].process(samples[n], sampleRate,40,5);
+            s[n] = effect[ch].process(s[n], sampleRate);
         }
     }
 
