@@ -127,9 +127,18 @@ public:
     void set_mix(float m) { p.mix = m; }
 
 
-    void set_parameters_terminal() {
-        parameter_info();
+    void enter_parameters_manually() {
 
+        // Ask the user if he/she wants to enter the parameters manually 
+        char choice;
+        std::cout << "Use default parameters? (y/n): ";
+        std::cin >> choice;
+
+        if (choice == 'y' || choice == 'Y')
+            return;
+
+
+        parameter_info();
         float r, d, m;
 
         // Rate

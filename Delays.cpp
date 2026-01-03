@@ -34,7 +34,7 @@ int main() {
     std::vector<Flanger> effect(numChannels);
     
     for (int ch = 0; ch < numChannels; ++ch) {
-        effect[ch].set_parameters_terminal();
+        effect[ch].enter_parameters_manually();
         auto& s = audio.samples[ch];
         for (int n = 0; n < numSamples; ++n) {
             s[n] = effect[ch].process(s[n], sampleRate);
