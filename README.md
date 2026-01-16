@@ -6,13 +6,7 @@ A digital delay effect is implemented where the delay time (ms), wetness, and th
 
 The input audio file must be a .wav file. After running the main code, an output .wav file is produced after being processed.
 
-## Delay Architecture
-
-The samples are saved in a circular buffer. 
-
-## Modulation delay effect
-
-I implement a vibrato, chorus and flanger effect. In all of them an LFO is used to modulate the delay. 
+The samples for the delay implementation are saved in a circular buffer. 
 
 ## Modulation Delay Effects
 
