@@ -40,11 +40,11 @@ struct DelayIIRProcessor {
     float process(float input, std::size_t delay_samples, float wetness, float feedback) noexcept {
         // Checking if the buffer size is enough
         if (delay_samples >= BUF_SIZE) {
-        std::cerr << "Delay too large for BUF_SIZE.\n"
-                  << "delay_samples = " << delay_samples
-                  << ", BUF_SIZE = " << BUF_SIZE << "\n"
-                  << "Increase BUF_SIZE (power of two) or reduce delayMs.\n";
-        return 1;
+            std::cerr << "Delay too large for BUF_SIZE.\n"
+                    << "delay_samples = " << delay_samples
+                    << ", BUF_SIZE = " << BUF_SIZE << "\n"
+                    << "Increase BUF_SIZE (power of two) or reduce delayMs.\n";
+            return 1;
         }
 
         float delayed_input  = input_buffer.getElement(delay_samples);
@@ -190,6 +190,7 @@ public:
 class Vibrato : public ModulationFxProcessor {
     public:
         Vibrato() {
+        std::cout << "Vibrato effect loaded \n";
         //Constructor with common values for the effect
         p.rateHz = 5.0f;
         p.depthSamples = 10.0f;
@@ -216,6 +217,7 @@ class Vibrato : public ModulationFxProcessor {
 class Chorus : public ModulationFxProcessor {
 public:
     Chorus() {
+        std::cout << "Chorus effect loaded \n";
         // Constructor with common values for the effect
         p.rateHz = 0.8f;        // slow modulation
         p.depthSamples = 96.0f; // ~2 ms, since 48 kHz
@@ -244,6 +246,7 @@ class Flanger : public ModulationFxProcessor {
 public:
     Flanger() {
         // Constructor with common values for the effect
+        std::cout << "Flanger effect loaded \n";
         p.rateHz = 0.2f;         // slow sweep
         p.depthSamples = 48.0f;  // ~1 ms, since 48 kHz
         p.mix = 0.5f;

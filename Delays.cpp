@@ -8,7 +8,7 @@
 int main() {
     // 1) Load input wav
     AudioFile<float> audio;
-    if (!audio.load("demo_guitar.wav")) {
+    if (!audio.load("PCcity.wav")) {
         std::cerr << "Failed to load input.wav\n";
         return 1;
     }
@@ -46,8 +46,8 @@ int main() {
     if (!audio.save("output.wav", AudioFileFormat::Wave)) {
         std::cerr << "Failed to save output.wav\n";
         return 1;
+        
     }
-
     std::cout << "Wrote output.wav\n";
     return 0;
 }
