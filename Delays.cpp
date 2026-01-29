@@ -8,7 +8,7 @@
 int main() {
     // 1) Load input wav
     AudioFile<float> audio;
-    if (!audio.load("PCcity.wav")) {
+    if (!audio.load("demo_guitar.wav")) {
         std::cerr << "Failed to load input.wav\n";
         return 1;
     }
@@ -31,10 +31,10 @@ int main() {
     std::size_t delay_samples = static_cast<std::size_t> (std::llround((delayMs / 1000.0f) * sampleRate));
 
     // 3) Create one processor per channel
-    std::vector<Flanger> effect(numChannels);
+    std::vector<Vibrato> effect(numChannels);
     
     for (int ch = 0; ch < numChannels; ++ch) {
-        effect[ch].enter_parameters_manually();
+        effect[ch].user_interface(sampleRate);
         auto& s = audio.samples[ch];
         for (int n = 0; n < numSamples; ++n) {
             s[n] = effect[ch].process(s[n], sampleRate);

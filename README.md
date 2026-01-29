@@ -95,7 +95,7 @@ All effects require:
 
 **Characteristics**
 - Dry signal: Yes
-- Feedback: Yes
+- Feedback: Maybe, you choose. The feedback sharpens the nodges of the comb filter creating a metallic sound.
 - Delay range: very short
 
 **Typical Parameters**

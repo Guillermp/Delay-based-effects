@@ -79,6 +79,7 @@ protected:
     virtual float baseDelaySamples(int Fs) const noexcept = 0;
 public:
     virtual void parameter_info() = 0;
+    virtual void user_interface(int Fs) = 0;
     // depthSamples: modulation depth in samples (e.g. 5..50)
     // rateHz: LFO rate in Hz (e.g. 0.5..8)
     // baseDelaySamples: constant delay offset in samples (must be >= depthSamples + 1) (it's the average delay)
@@ -206,11 +207,51 @@ class Vibrato : public ModulationFxProcessor {
                 << "LFO rate:           4 - 7 Hz\n"
                 << "\n";
         }
+        void user_interface(int Fs) override {
+        // Ask the user if he/she wants to enter the parameters manually 
+        char choice;
+        std::cout << "Use default parameters? (y/n): ";
+        std::cin >> choice;
+
+        if (choice == 'y' || choice == 'Y')
+            return;
+
+        float r, d;
+
+        // Vibrato frequency
+        while (true) {
+            std::cout << "Insert the desired vibrato frequency in Hz: ";
+            if (std::cin >> r && std::isfinite(r)) {
+                set_rateHz(r);
+                std::cout << "Rate set to " << r << " Hz\n";
+                break;
+            }
+            std::cout << "Invalid value. Please enter a valid number.\n";
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+
+        // Frequency variation
+        while (true) {
+            std::cout << "Insert the frequency variation in %: ";
+            if (std::cin >> d && std::isfinite(d)) {
+                double f_ratio = 1 + d/100.f;
+                const float twoPi = 6.283185307179586f;
+                float A = (f_ratio - 1)/(twoPi*r)*Fs;
+                set_depthSamples(A);
+                std::cout << "Frequency variation is set to " << d << " %\n";
+                break;
+            }
+            std::cout << "Invalid value. Please enter a valid number.\n";
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+
+    }
     protected:
     float baseDelaySamples(int Fs) const noexcept override {
         return p.depthSamples + 1.0f;
     }
-
 };
 
 // ---------------- Chorus -------------------------------------- //
