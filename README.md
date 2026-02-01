@@ -89,21 +89,34 @@ All effects require:
 ### Flanger
 
 **Concept**
-- Moving comb filter
-- Interference between dry and delayed signal
+- Interference between dry and delayed signal: the flanger effect is created by mixing a signal with a slightly shifted copy of itself, the destructive and constructive interference of the sigals creates a comb filter with notches equally spaced in the frequency spectrum. By modulating the dalay amount between the signals the comb filter is swept over time [1].
+- In addition, the even space between the notches creates an audiable resonant pitch [1].
+- The total delay is normally kept way below the echo perception (50ms-70ms). Normally around 1-10ms [1].
+- The **delay model** parameters are found with the following formulas.
+    >$$D_0=(M_0+\frac{M_w}{2})$$
+    >$$A=\frac{M_w}{2}$$
 
+**User Parameters**
+- **Minimum delay $M_0$**: this is the *delay* knob. It sets the highest frequency the first notch will reach during the sweeping of the filter.
+- **Sweep width $M_w$**: amplitude of the LFO. The maximum delay is $M_0+M_w$, which determines the lowest frequency reached by the first notch.
+
+- **LFO rate**: usually 0.1-10Hz
+
+#### Flanger – Parameter Guide
+
+| Parameter | Typical Range | What it Controls | Audible Effect |
+|---------|---------------|------------------|----------------|
+| Minimum delay $M_0$ (ms) | 0.1 – 2.0 | Highest frequency reached by the first comb notch | Smaller → brighter, metallic • Larger → darker, hollow |
+| Sweep width $M_w$ (ms) | 0.1 – 3.0 | Depth of the delay modulation (peak-to-peak) | Small → subtle motion • Large → dramatic “jet” sweep |
+| LFO rate (Hz) | 0.05 – 2.0 | Speed of the sweep | Slow → smooth, evolving • Fast → intense, animated |
+| Mix (wet/dry) | 0.3 – 0.7 | Strength of the comb filtering | 0.5 → deepest notches • Lower → more natural |
+| Feedback (optional) | −0.7 – +0.7 | Amount of delayed signal fed back | + → metallic/jet • − → hollow/vocal |
 
 **Characteristics**
 - Dry signal: Yes
-- Feedback: Maybe, you choose. The feedback sharpens the nodges of the comb filter creating a metallic sound.
+- Feedback: Maybe, you choose. The feedback sharpens the nodges of the comb filter creating a metallic sound. **Not implemented yet**.
 - Delay range: very short
 
-**Typical Parameters**
-- Base delay: 0.5–3 ms
-- Depth: 0.5–3 ms
-- Rate: 0.05–2 Hz
-- Mix: ~50%
-- Feedback: 0.2–0.8
 
 
 

@@ -78,7 +78,7 @@ protected:
     } p;
     virtual float baseDelaySamples(int Fs) const noexcept = 0;
 public:
-    virtual void parameter_info() = 0;
+    virtual void default_parameter_info() = 0;
     virtual void user_interface(int Fs) = 0;
     // depthSamples: modulation depth in samples (e.g. 5..50)
     // rateHz: LFO rate in Hz (e.g. 0.5..8)
@@ -139,7 +139,7 @@ public:
             return;
 
 
-        parameter_info();
+        default_parameter_info();
         float r, d, m;
 
         // Rate
@@ -197,7 +197,7 @@ class Vibrato : public ModulationFxProcessor {
         p.depthSamples = 10.0f;
         p.mix = 1.0f;
         }
-        void parameter_info() override {
+        void default_parameter_info() override {
             std::cerr
                 << "Vibrato — typical parameter ranges\n"
                 << "---------------------------------\n"
@@ -265,7 +265,7 @@ public:
         p.mix = 0.5f;           // dry + wet
     }
 
-    void parameter_info() override {
+    void default_parameter_info() override {
         std::cerr
             << "Chorus — typical parameter ranges\n"
             << "--------------------------------\n"
@@ -293,7 +293,9 @@ public:
         p.mix = 0.5f;
     }
 
-    void parameter_info() override {
+    float custom_min_delay = 0.0f;
+
+    void default_parameter_info() override {
         std::cerr
             << "Flanger — typical parameter ranges\n"
             << "---------------------------------\n"
@@ -303,9 +305,77 @@ public:
             << "LFO rate:           0.05 - 2 Hz\n"
             << "\n";
     }
+    void user_interface(int Fs) override {
+        // Ask the user if he/she wants to enter the parameters manually 
+        char choice;
+        std::cout << "Use default parameters? (y/n): ";
+        std::cin >> choice;
+
+        if (choice == 'y' || choice == 'Y')
+            return;
+
+        float r, M0_ms, Mw_ms;
+
+        // LFO rate
+        while (true) {
+            std::cout << "Insert the LFO rate: ";
+            if (std::cin >> r && std::isfinite(r)) {
+                set_rateHz(r);
+                std::cout << "Rate set to " << r << " Hz\n";
+                break;
+            }
+            std::cout << "Invalid value. Please enter a valid number.\n";
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+
+        // Minimum Delay
+        while (true) {
+            std::cout << "Insert the Minimum Delay parameter (ms): ";
+            if (std::cin >> M0_ms && std::isfinite(M0_ms)) {
+                
+                std::cout << "The Minimum Delay parameter is set to " << M0_ms << " ms\n";
+                break;
+            }
+            std::cout << "Invalid value. Please enter a valid number.\n";
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+
+        // Sweep width
+        while (true) {
+            std::cout << "Insert the Sweep width parameter (ms): ";
+            if (std::cin >> Mw_ms && std::isfinite(Mw_ms)) {
+                
+                std::cout << "The Sweep width parameter is set to " << Mw_ms << " ms\n";
+                break;
+            }
+            std::cout << "Invalid value. Please enter a valid number.\n";
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+
+        // Setting
+        float A  = 0.5f * Mw_ms * float(Fs) / 1000.0f; // In samples
+        float D0 = (M0_ms + 0.5f * Mw_ms) * float(Fs) / 1000.0f; //In samples
+
+
+        // Safety: ensure base delay is large enough so delay never drops too low
+        if (D0 < A + 1.0f) {
+            D0 = A + 1.0f;
+        }
+        set_depthSamples(A);
+        custom_min_delay = D0;
+
+    }
 
 protected:
     float baseDelaySamples(int Fs) const noexcept override {
-        return 0.001f * Fs; // 1 ms
+        if (custom_min_delay == 0){
+            return 0.001f * Fs; // 1 ms
+        }
+        else {
+            return custom_min_delay;
+        }
     }
 };

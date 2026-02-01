@@ -31,7 +31,7 @@ int main() {
     std::size_t delay_samples = static_cast<std::size_t> (std::llround((delayMs / 1000.0f) * sampleRate));
 
     // 3) Create one processor per channel
-    std::vector<Vibrato> effect(numChannels);
+    std::vector<Flanger> effect(numChannels);
     
     for (int ch = 0; ch < numChannels; ++ch) {
         effect[ch].user_interface(sampleRate);
