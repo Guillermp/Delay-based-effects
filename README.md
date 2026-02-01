@@ -93,8 +93,8 @@ All effects require:
 - In addition, the even space between the notches creates an audiable resonant pitch [1].
 - The total delay is normally kept way below the echo perception (50ms-70ms). Normally around 1-10ms [1].
 - The **delay model** parameters are found with the following formulas.
-    >$$D_0=(M_0+\frac{M_w}{2})$$
-    >$$A=\frac{M_w}{2}$$
+    >- $$D_0=(M_0+\frac{M_w}{2})$$
+    >- $$A=\frac{M_w}{2}$$
 
 **User Parameters**
 - **Minimum delay $M_0$**: this is the *delay* knob. It sets the highest frequency the first notch will reach during the sweeping of the filter.
