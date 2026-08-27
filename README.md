@@ -118,7 +118,5 @@ All effects require:
 - Delay range: very short
 
 
-
-
 ## References
 [1] Reiss, J. D., & McPherson, A. P. (2026). Audio effects: theory, implementation and application. CRC Press.

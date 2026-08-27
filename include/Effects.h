@@ -1,4 +1,4 @@
-
+#include <iostream>
 #include <cstddef>  
 #include <cmath>    
 #include <array>
@@ -38,6 +38,15 @@ struct DelayIIRProcessor {
     CircularBuffer<float, BUF_SIZE> output_buffer;
 
     float process(float input, std::size_t delay_samples, float wetness, float feedback) noexcept {
+        // Checking if the buffer size is enough
+        if (delay_samples >= BUF_SIZE) {
+        std::cerr << "Delay too large for BUF_SIZE.\n"
+                  << "delay_samples = " << delay_samples
+                  << ", BUF_SIZE = " << BUF_SIZE << "\n"
+                  << "Increase BUF_SIZE (power of two) or reduce delayMs.\n";
+        return 1;
+        }
+
         float delayed_input  = input_buffer.getElement(delay_samples);
         float delayed_output = output_buffer.getElement(delay_samples);
 
@@ -50,18 +59,19 @@ struct DelayIIRProcessor {
     }
 };
 
-// ---------------- Vibrato processor ------------------ //
+// ---------------- Modulation effect processor ------------------ //
 constexpr std::size_t BUF_SIZE_vibrato = 1024;
-struct VibratoProcessor {
+struct ModulationFxProcessor {
 private:
     CircularBuffer<float, BUF_SIZE_vibrato> input_buffer;
 
     float phase = 0.0f; // [0, 2π)
+    bool first_entrance = true;
 public:
     // depthSamples: modulation depth in samples (e.g. 5..50)
     // rateHz: LFO rate in Hz (e.g. 0.5..8)
     // baseDelaySamples: constant delay offset in samples (must be >= depthSamples + 1) (it's the average delay)
-    float process(float input, int Fs, float depthSamples, float rateHz) noexcept {
+    float process(float input, int Fs, float depthSamples, float rateHz, bool log=false) noexcept {
         input_buffer.push(input);
 
         // advance LFO phase
@@ -70,8 +80,20 @@ public:
         if (phase >= twoPi) phase -= twoPi;
 
         // time-varying delay
-        float baseDelaySamples = depthSamples + 1;
+        //float baseDelaySamples = depthSamples + 1;
+        float baseDelaySamples = 0.020f * Fs; // 20 ms
         float delay = baseDelaySamples + depthSamples * std::sin(phase); // DC signal + AC signal
+
+        float max_delay = (baseDelaySamples + depthSamples)/float(Fs)*1000.0f;
+        float min_delay = (baseDelaySamples - depthSamples)/float(Fs)*1000.0f;
+
+        if (log && first_entrance){
+            first_entrance = false;
+              std::cout << "Modulation effect: Range of the delay" 
+                        << " | max: (ms) " << max_delay
+                        << " | min: (ms) " << min_delay
+                        << "\n";
+        }
 
         // clamp to safe range for interpolation
         // need delay and delay+1 valid
@@ -84,6 +106,8 @@ public:
         float y0 = input_buffer.getElement(std::size_t(d0));
         float y1 = input_buffer.getElement(std::size_t(d0 + 1));
 
-        return (1.0f - frac) * y0 + frac * y1; // iterpolated value (to a aproximate the value at the fractional delay time index) (illusion of continuous waveform)
+        float wet_signal = (1.0f - frac) * y0 + frac * y1;
+
+        return 0.5*wet_signal + 0.5*input; // iterpolated value (to a aproximate the value at the fractional delay time index) (illusion of continuous waveform)
     }
 };
